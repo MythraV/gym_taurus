@@ -1,2 +1,1 @@
-from gym_yumi.envs.yumi_env import YumiEnv
-
+from gym_taurus.envs.taurus_env import TaurusEnv

@@ -1,4 +1,4 @@
-from gym_yumi.envs.robot import *
+from gym_taurus.envs.robot import *
 from pyrep import PyRep
 from pyrep.objects.shape import Shape
 from pyrep.objects.object import Object
@@ -7,32 +7,32 @@ import gym
 from gym import spaces
 import numpy as np
 
-class Yumi():
+class Taurus():
     def __init__(self):
         joint_names = {'left':[
-            'yumi_l_joint1','yumi_l_joint2','yumi_l_joint3','yumi_l_joint4',
-            'yumi_l_joint5','yumi_l_joint6','yumi_l_joint7'
+            'taurus_l_joint1','taurus_l_joint2','taurus_l_joint3','taurus_l_joint4',
+            'taurus_l_joint5','taurus_l_joint6','taurus_l_joint7'
         ],
         'right': [
-            'yumi_r_joint1','yumi_r_joint2','yumi_r_joint3','yumi_r_joint4',
-            'yumi_r_joint5','yumi_r_joint6','yumi_r_joint7'
+            'taurus_r_joint1','taurus_r_joint2','taurus_r_joint3','taurus_r_joint4',
+            'taurus_r_joint5','taurus_r_joint6','taurus_r_joint7'
         ]}
-        self.left = Limb('yumi_l_tip', joint_names['left'])
-        self.right = Limb('yumi_r_tip', joint_names['right'])
+        self.left = Limb('taurus_l_tip', joint_names['left'])
+        self.right = Limb('taurus_r_tip', joint_names['right'])
         self.left_gripper = TwoFingerGripper(['gripper_l_joint','gripper_l_joint_m'])
         self.right_gripper = TwoFingerGripper(['gripper_r_joint','gripper_r_joint_m'])
 
-class YumiEnv(gym.Env):
+class TaurusEnv(gym.Env):
     def __init__(self, limb='left', goal='peg_target_res', rewardfun=None, headless=False, mode='passive', maxval=0.1):
         self.pr = PyRep()
-        SCENE_FILE = '/media/mythra/Data/Mythra/Research/ForWard/gym_yumi/gym_yumi/envs/yumi_setup.ttt'
+        SCENE_FILE = '/media/mythra/Data/Mythra/Research/ForWard/gym_taurus/gym_taurus/envs/taurus_debridement_new.ttt'
         self.pr.launch(SCENE_FILE, headless=headless)
         self.pr.start()
-        yumi = Yumi()
+        taurus = Taurus()
         if limb=='left':
-            self.limb = yumi.left
+            self.limb = taurus.left
         elif limb=='right':
-            self.limb = yumi.right
+            self.limb = taurus.right
         self.mode = mode
         if mode=='force':
             self.limb.set_joint_mode('force')
@@ -165,8 +165,8 @@ class YumiEnv(gym.Env):
         return reward
 
 if __name__ == "__main__":
-    "Example usage for the YumiRLEnv"
-    env = YumiEnv('left','peg_target_res',mode='passive', headless=True,maxval=0.1)
+    "Example usage for the TaurusRLEnv"
+    env = TaurusEnv('left','peg_target_res',mode='passive', headless=True,maxval=0.1)
     print([env.limb.get_joint_position(x) for x in range(7)])
     time.sleep(1)
     for ieps in range(20):
