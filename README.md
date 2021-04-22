@@ -1,8 +1,8 @@
-The gym environment for Yumi
+The gym environment for Taurus
 
-# gym-yumi
+# gym-Taurus
 
-gym environment for ABB Yumi robot using VREP simulator.
+gym environment for Taurus robot using CoppeliaSim simulator.
 
 ## Requirements
 
@@ -18,8 +18,8 @@ Please install the following requirements before using this environment. It is r
 # Installation
 
 ```bash
-git clone https://github.com/MythraV/gym_yumi.git
-cd gym-yumi
+git clone https://github.com/MythraV/gym_taurus.git
+cd gym-taurus
 pip install -e .
 ```
 
@@ -28,9 +28,9 @@ Test environment with gym
 ```bash
 python
 import gym
-env = gym.make('gym-yumi:yumi-pegtransfer-v0')
+env = gym.make('gym-taurus:taurus-deb-v0')
 ```
 Running with openai/baselines or stable_baselines
 ```bash
-python -m baselines.run --alg=ppo2 --env=gym_yumi:yumi-pegtransfer-v0 --network=mlp --num_timesteps=2e7 --num_env=6 --save_path=/media/crl/DATA/Datasets/RLmodels/yumi --save_interval=1e5
+python -m baselines.run --alg=ppo2 --env=gym_taurus:taurus-deb-v0 --network=mlp --num_timesteps=2e7 --num_env=6 --save_path=/media/crl/DATA/Datasets/RLmodels/taurus --save_interval=1e5
 ```
