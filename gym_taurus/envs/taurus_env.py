@@ -58,10 +58,13 @@ class TaurusEnv(gym.Env):
             self.rewardfcn = self._get_reward
         else:
             self.rewardfcn = rewardfun
-        self.default_config = [-1.0122909545898438, -1.5707963705062866,
-                             0.9759880900382996, 0.6497860550880432,
-                              1.0691887140274048, 1.1606439352035522,
-                               0.3141592741012573]
+        # self.default_config = [-1.0122909545898438, -1.5707963705062866,
+        #                      0.9759880900382996, 0.6497860550880432,
+        #                       1.0691887140274048, 1.1606439352035522,
+        #                        0.3141592741012573]
+        # fixed default config
+        self.default_config = [-0.24434609711170197, -0.7504915595054626, 2.862339973449707, 1.4098769426345825, 1.5699236392974854, 0.0, 0.0]
+
         # set configs for resetting
         self.taurus_body = Shape('Taurus')
         self.taurus_body_config = self.taurus_body.get_configuration_tree()
@@ -100,6 +103,11 @@ class TaurusEnv(gym.Env):
         """
         # Assert the action space space contains the action
         assert self.action_space.contains(action), "Action {} ({}) is invalid".format(action, type(action))
+        
+        # make sure phyics on
+        if not self.pr.running:
+            self.pr.start()
+        
         # Actuate
         self._make_action(action)
         # Step
@@ -119,20 +127,21 @@ class TaurusEnv(gym.Env):
         return self.observation, reward, done, {}
 
 
-    def reset_tree(self):
+    def reset(self):
         """Gym environment 'reset'
         """
-        if self.pr.running:
+        if not self.pr.running:
             self.pr.start()
 
         # reset body and debri
+        #self.taurus_body.reset_dynamic_object()
         self.pr.set_configuration_tree(self.taurus_body_config)
         self.pr.set_configuration_tree(self.taurus_debri_config)
 
 
         self.limb.set_joint_mode(self.mode)
-        # for i in range(len(self.limb.joints)):
-        #     self.limb.set_joint_position(i,self.default_config[i])
+        for i in range(len(self.limb.joints)):
+            self.limb.set_joint_position(i,self.default_config[i])
         self._make_observation()
         #print(self.observation)
 
@@ -142,7 +151,7 @@ class TaurusEnv(gym.Env):
 
         return self.observation
 
-    def reset(self):
+    def reset_old(self):
         """Gym environment 'reset' old version
         """
         if self.pr.running:
@@ -150,10 +159,12 @@ class TaurusEnv(gym.Env):
         self.pr.start()
         self.pr.stop()
         self.pr.start()
+        self.pr.step()
+        self.pr.step()
 
         self.limb.set_joint_mode(self.mode)
-        # for i in range(len(self.limb.joints)):
-        #     self.limb.set_joint_position(i,self.default_config[i])
+        for i in range(len(self.limb.joints)):
+            self.limb.set_joint_position(i,self.default_config[i])
         self._make_observation()
         print(self.observation)
         return self.observation
@@ -204,7 +215,7 @@ if __name__ == "__main__":
         observation = env.reset()
         total_reward = 0
         action = env.action_space.sample()
-        for t in range(10):
+        for t in range(50):
             #action = env.action_space.sample()
             observation, reward, done,_ = env.step(action)
             total_reward += reward

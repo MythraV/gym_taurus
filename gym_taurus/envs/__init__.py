@@ -1,1 +1,2 @@
 from gym_taurus.envs.taurus_env import TaurusEnv
+from gym_taurus.envs.subproc_vec_taurus_env import SubprocVecTaurusEnv

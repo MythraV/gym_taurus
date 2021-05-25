@@ -70,5 +70,11 @@ class Limb():
     def get_joint_position(self, joint_n):
         return 	self.joints[joint_n].get_joint_position()
 
+    def get_joint_positions(self):
+        positions = []
+        for joint in self.joints:
+            positions.append(joint.get_joint_position())
+        return positions
+
     def get_joint_velocity(self, joint_val):
         return 	self.joints[joint_n].get_joint_velocity()
