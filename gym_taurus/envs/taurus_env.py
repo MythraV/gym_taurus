@@ -62,6 +62,11 @@ class TaurusEnv(gym.Env):
                              0.9759880900382996, 0.6497860550880432,
                               1.0691887140274048, 1.1606439352035522,
                                0.3141592741012573]
+        # set configs for resetting
+        self.taurus_body = Shape('Taurus')
+        self.taurus_body_config = self.taurus_body.get_configuration_tree()
+        self.taurus_debri_config = Shape('debri_res_1').get_configuration_tree()
+
 
     def _make_observation(self):
         """Query V-rep to make observation.
@@ -113,8 +118,32 @@ class TaurusEnv(gym.Env):
             done=True
         return self.observation, reward, done, {}
 
-    def reset(self):
+
+    def reset_tree(self):
         """Gym environment 'reset'
+        """
+        if self.pr.running:
+            self.pr.start()
+
+        # reset body and debri
+        self.pr.set_configuration_tree(self.taurus_body_config)
+        self.pr.set_configuration_tree(self.taurus_debri_config)
+
+
+        self.limb.set_joint_mode(self.mode)
+        # for i in range(len(self.limb.joints)):
+        #     self.limb.set_joint_position(i,self.default_config[i])
+        self._make_observation()
+        #print(self.observation)
+
+        # second statement may not be needed
+        if not self.pr.running:
+            self.pr.start()
+
+        return self.observation
+
+    def reset(self):
+        """Gym environment 'reset' old version
         """
         if self.pr.running:
             self.pr.stop()
@@ -123,8 +152,8 @@ class TaurusEnv(gym.Env):
         self.pr.start()
 
         self.limb.set_joint_mode(self.mode)
-        for i in range(len(self.limb.joints)):
-            self.limb.set_joint_position(i,self.default_config[i])
+        # for i in range(len(self.limb.joints)):
+        #     self.limb.set_joint_position(i,self.default_config[i])
         self._make_observation()
         print(self.observation)
         return self.observation
@@ -175,7 +204,7 @@ if __name__ == "__main__":
         observation = env.reset()
         total_reward = 0
         action = env.action_space.sample()
-        for t in range(20):
+        for t in range(10):
             #action = env.action_space.sample()
             observation, reward, done,_ = env.step(action)
             total_reward += reward
