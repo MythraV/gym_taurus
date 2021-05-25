@@ -28,7 +28,7 @@ Test environment with gym
 ```bash
 python
 import gym
-env = gym.make('gym-taurus:taurus-deb-v0')
+env = gym.make('gym_taurus:taurus-deb-v0')
 ```
 Running with openai/baselines or stable_baselines
 ```bash
