@@ -6,26 +6,28 @@ import time
 import gym
 from gym import spaces
 import numpy as np
+import os
 
 class Taurus():
     def __init__(self):
         joint_names = {'left':[
-            'taurus_l_joint1','taurus_l_joint2','taurus_l_joint3','taurus_l_joint4',
-            'taurus_l_joint5','taurus_l_joint6','taurus_l_joint7'
+            'Taurus_l_joint1','Taurus_l_joint2','Taurus_l_joint3','Taurus_l_joint4',
+            'Taurus_l_joint5','Taurus_l_joint6','Taurus_l_joint7'
         ],
         'right': [
-            'taurus_r_joint1','taurus_r_joint2','taurus_r_joint3','taurus_r_joint4',
-            'taurus_r_joint5','taurus_r_joint6','taurus_r_joint7'
+            'Taurus_r_joint1','Taurus_r_joint2','Taurus_r_joint3','Taurus_r_joint4',
+            'Taurus_r_joint5','Taurus_r_joint6','Taurus_r_joint7'
         ]}
-        self.left = Limb('taurus_l_tip', joint_names['left'])
-        self.right = Limb('taurus_r_tip', joint_names['right'])
+        self.left = Limb('Taurus_l_tip', joint_names['left'])
+        self.right = Limb('r_tip', joint_names['right'])
         self.left_gripper = TwoFingerGripper(['gripper_l_joint','gripper_l_joint_m'])
         self.right_gripper = TwoFingerGripper(['gripper_r_joint','gripper_r_joint_m'])
 
 class TaurusEnv(gym.Env):
-    def __init__(self, limb='left', goal='peg_target_res', rewardfun=None, headless=False, mode='passive', maxval=0.1):
+    def __init__(self, limb='left', goal='debri_res_1', rewardfun=None, headless=False, mode='passive', maxval=0.1):
         self.pr = PyRep()
-        SCENE_FILE = '/media/mythra/Data/Mythra/Research/ForWard/gym_taurus/gym_taurus/envs/taurus_debridement_new.ttt'
+        #SCENE_FILE = '/media/mythra/Data/Mythra/Research/ForWard/gym_taurus/gym_taurus/envs/taurus_debridement_new.ttt'
+        SCENE_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Taurus_debridement_new.ttt')
         self.pr.launch(SCENE_FILE, headless=headless)
         self.pr.start()
         taurus = Taurus()
@@ -65,11 +67,11 @@ class TaurusEnv(gym.Env):
         """Query V-rep to make observation.
            The observation is stored in self.observation
         """
-        lst_o = [];
+        lst_o = []
         # example: include position, linear and angular velocities of all shapes
         for oh in self.oh_shape:
-            lst_o += oh.get_position() 	# position
-            lst_o += oh.get_orientation()
+            lst_o.extend(oh.get_position()) 	# position
+            lst_o.extend(oh.get_orientation())
 
         self.observation = np.array(lst_o).astype('float32');
 
@@ -166,16 +168,16 @@ class TaurusEnv(gym.Env):
 
 if __name__ == "__main__":
     "Example usage for the TaurusRLEnv"
-    env = TaurusEnv('left','peg_target_res',mode='passive', headless=True,maxval=0.1)
+    env = TaurusEnv('left','debri_res_1',mode='passive', headless=False,maxval=0.1)
     print([env.limb.get_joint_position(x) for x in range(7)])
     time.sleep(1)
-    for ieps in range(20):
+    for ieps in range(5):
         observation = env.reset()
         total_reward = 0
         action = env.action_space.sample()
-        for t in range(5):
+        for t in range(20):
             #action = env.action_space.sample()
-            observation, reward, done = env.step(action)
+            observation, reward, done,_ = env.step(action)
             total_reward += reward
             if done:
                 break
